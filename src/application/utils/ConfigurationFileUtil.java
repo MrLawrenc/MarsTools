@@ -10,6 +10,8 @@ import java.util.List;
 import application.translate.baidu.BaiDuTrans;
 
 public class ConfigurationFileUtil {
+	
+	public String toolsVersion;
 	private ConfigurationFileUtil() {
 	}
 
@@ -73,6 +75,8 @@ public class ConfigurationFileUtil {
 
 			case "baiduTrans.securityKey":
 				BaiDuTrans.obj.setSECURITY_KEY(split[1]);
+			case "tools.version":
+				this.toolsVersion=split[1];
 			}
 		}
 	}

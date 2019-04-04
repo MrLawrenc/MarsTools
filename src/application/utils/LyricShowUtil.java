@@ -1,6 +1,7 @@
 package application.utils;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import application.music.kuwo.KuwoMusic;
 import application.music.pojo.kuwo.KuwoLyric;
@@ -34,15 +35,22 @@ public class LyricShowUtil {
 					return;
 				} ;
 
+				Double temp=Double.valueOf(time).doubleValue()*1000- player.getCurrentTime().toMillis();//单位是毫秒ms
 				// 设置歌词显示精度
-				if (Double.valueOf(time).doubleValue()
-						- player.getCurrentTime().toSeconds() < 0.1) {
+				if ( temp< 0.1) {
 					System.out.println("======显示歌词" + Double.valueOf(time).doubleValue() + " "
 							+ player.getCurrentTime().toSeconds());
 					System.out
 							.println(lrcText + "  " + kuwoLyric + "  " + kuwoLyric.getLineLyric());
 					lrcText.setText(kuwoLyric.getLineLyric());
 					break;
+				}else {
+					try {
+						TimeUnit.MILLISECONDS.sleep(temp.longValue());
+					} catch (InterruptedException e) {
+						System.out.println("歌词显示线程readyLyric出错");
+						e.printStackTrace();
+					}
 				}
 			}
 		}

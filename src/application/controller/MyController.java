@@ -186,6 +186,7 @@ public class MyController implements Initializable {
 			if (player==null) {
 				lyricShowUtil = new LyricShowUtil();
 			}else {
+				lyricShowUtil.isStop=true;
 				player.stop();//说明是切歌，需要先停止之前播放的歌曲
 			}
 			// 获取当前选中的label
@@ -232,6 +233,7 @@ public class MyController implements Initializable {
 	public void stop(ActionEvent event) {
 		lyricShowUtil.isStop=true;
 		player.stop();
+		
 		System.out.println("====已经停止=======" + player.getStatus());
 
 	}

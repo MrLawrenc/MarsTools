@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+	static ConfigurationFileUtil myConf=ConfigurationFileUtil.obj;
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -28,7 +29,7 @@ public class Main extends Application {
 			controller.shortcutKeys();
 
 			primaryStage.setScene(scene);
-			primaryStage.setTitle("mars的小工具");
+			primaryStage.setTitle("mars的小工具 v"+myConf.toolsVersion);
 			primaryStage.show();
 
 		} catch (Exception e) {
@@ -40,7 +41,7 @@ public class Main extends Application {
 
 		// 配置文件初始化-装配所有属性
 		List<String> props = ConfigurationFileUtil.obj.getPropFromConfigFile();
-		ConfigurationFileUtil.obj.assemblyProps(props);
+		myConf.assemblyProps(props);
 		launch(args);
 
 	}
