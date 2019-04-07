@@ -8,7 +8,7 @@
 <AnchorPane prefHeight="529.0" prefWidth="562.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="application.controller.MyController">
   <!-- TODO Add Nodes -->
   <children>
-    <Button id="myBtn" layoutX="7.0" layoutY="10.0" mnemonicParsing="false" onAction="#trans" prefHeight="23.0" text="点我翻译" />
+    <Button fx:id="myBtn" layoutX="7.0" layoutY="10.0" mnemonicParsing="false" onAction="#trans" prefHeight="23.0" text="点我翻译" />
     <TextArea fx:id="inText" layoutX="7.0" layoutY="33.0" prefHeight="93.0" prefWidth="162.0" wrapText="true" />
     <TextArea fx:id="outText" layoutX="187.0" layoutY="33.0" prefHeight="93.0" prefWidth="295.0" wrapText="true" />
     <Button layoutX="7.0" layoutY="258.0" mnemonicParsing="false" onAction="#play" prefHeight="23.0" prefWidth="85.0" text="播放" textFill="BLACK" />

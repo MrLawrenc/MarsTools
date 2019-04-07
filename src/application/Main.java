@@ -4,14 +4,16 @@ import java.util.List;
 
 import application.controller.MyController;
 import application.utils.ConfigurationFileUtil;
+import application.utils.ImageUtil;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-	static ConfigurationFileUtil myConf=ConfigurationFileUtil.obj;
+	static ConfigurationFileUtil myConf = ConfigurationFileUtil.obj;
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -25,11 +27,12 @@ public class Main extends Application {
 			Scene scene = new Scene(root);
 			controller.setScene(scene);
 			controller.setMainStage(primaryStage);
+
 			// 初始化綁定的快捷鍵
 			controller.shortcutKeys();
 
 			primaryStage.setScene(scene);
-			primaryStage.setTitle("mars的小工具 v"+myConf.toolsVersion);
+			primaryStage.setTitle("mars的小工具 v" + myConf.toolsVersion);
 			primaryStage.show();
 
 		} catch (Exception e) {
@@ -38,6 +41,12 @@ public class Main extends Application {
 	}
 
 	public static void main(String[] args) {
+
+		// //播放界面图片初始化(透明度设置)
+		// new Thread(() -> {
+		// Image image = new Image("/1.jpg", 0, 0, true, true);
+		// new ImageUtil().imgOpacity(image, 0.5);
+		// },"播放界面图片初始化线程").start();
 
 		// 配置文件初始化-装配所有属性
 		List<String> props = ConfigurationFileUtil.obj.getPropFromConfigFile();
