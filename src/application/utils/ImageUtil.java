@@ -105,15 +105,15 @@ public class ImageUtil {
 //		 }
 //		 }
 
-//		try {
-//			// 等待三个线程全部执行完毕
-//			if (futureTask1.get() && futureTask2.get() && futureTask3.get()) {
-//				backGroundImg = wImage;
-//			}
-//		} catch (InterruptedException | ExecutionException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		try {
+			// 等待三个线程全部执行完毕
+			if (futureTask1.get() && futureTask2.get() && futureTask3.get()) {
+				backGroundImg = wImage;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		return wImage;
 	}

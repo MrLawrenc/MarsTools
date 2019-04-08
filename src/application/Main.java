@@ -6,11 +6,13 @@ import application.controller.MyController;
 import application.utils.ConfigurationFileUtil;
 import application.utils.ImageUtil;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class Main extends Application {
 	static ConfigurationFileUtil myConf = ConfigurationFileUtil.obj;
@@ -33,6 +35,14 @@ public class Main extends Application {
 
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("mars的小工具 v" + myConf.toolsVersion);
+
+			//监听窗口关闭
+			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+				@Override
+				public void handle(WindowEvent event) {
+					System.exit(0);
+				}
+			});
 			primaryStage.show();
 
 		} catch (Exception e) {

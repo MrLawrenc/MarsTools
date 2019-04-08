@@ -56,31 +56,31 @@ public class MyController implements Initializable {
 	@FXML
 	private TextField lrcText;
 
-	private KuwoPojo nowMusic;
-	private KuwoPojo selectMusic;
+	private static KuwoPojo nowMusic;
+	private static Media media;
+	private static KuwoPojo selectMusic;
 	@Setter
 	public Scene scene;
 	@Setter
 	public Stage mainStage;
 
 	private KuwoMusic kuwoMusic = KuwoMusic.obj;
-	private MediaPlayer player;// 作为成员变量，保证了暂停再次播放的时候是同一首歌
+	private static MediaPlayer player;// 作为成员变量，保证了暂停再次播放的时候是同一首歌
 
 	private ObservableList<KuwoPojo> data;
 
-	private LyricShowUtil lyricShowUtil;
+	private static LyricShowUtil lyricShowUtil;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		
-		//初始化音乐相关信息
+
+		// 初始化音乐相关信息
 		initMusicInfo();
 
 		System.out.println("初始化controller,在加载该类对应的fxml问件时就会被调用");
 	}
 
 	/**
-	 * 
 	 * @Description 音乐相关组件初始化
 	 * @author LIu Mingyao
 	 */
@@ -95,7 +95,7 @@ public class MyController implements Initializable {
 					System.out.println(newValue + "   newValue");
 					selectMusic = newValue;
 				});
-		
+
 	}
 
 	/**
@@ -135,8 +135,8 @@ public class MyController implements Initializable {
 
 		String musciListHTML = kuwoMusic.searchMusic(searchStr);
 		List<KuwoLiLabel> labelList = kuwoMusic.parseLiLabelList(musciListHTML);
-
-		Long a = new Date().getTime();
+		if (labelList.size() == 0 && musciListHTML.contains("天翼飞")) throw new MarsException("请先联网");
+		long a = new Date().getTime();
 		List<FutureTask<KuwoPojo>> s = new ArrayList<FutureTask<KuwoPojo>>();
 		// 最多只展示10首歌,开多线程爬虫可以使时间缩短至一个爬虫的时间（100多）
 		for (int i = 0; i < labelList.size() && i < 10; i++) {
@@ -149,7 +149,7 @@ public class MyController implements Initializable {
 			s.add(futureTask);
 			new Thread(futureTask, "音乐搜索多线程" + i).start();
 		}
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < labelList.size() && i < 10; i++) {
 			try {
 				data.add(s.get(i).get());
 			} catch (InterruptedException | ExecutionException e) {
@@ -157,7 +157,8 @@ public class MyController implements Initializable {
 			}
 		}
 		s = null;
-		Long b = new Date().getTime();
+		labelList = null;
+		long b = new Date().getTime();
 		System.out.println("本次搜索共耗时 b - a=" + (b - a));
 
 		// Platform.runLater(() -> {
@@ -189,10 +190,8 @@ public class MyController implements Initializable {
 	 * @author LIu Mingyao
 	 */
 	public void play(ActionEvent event) {
-		//打开专用播放面板
-		PlayingPanel.obj.openPlayingState(mainStage);
+		System.gc();//回收10m左右空间
 		
-
 		if (selectMusic == null) {
 			System.out.println("*****************请先选择音乐再播放*****************");
 			return;
@@ -201,8 +200,7 @@ public class MyController implements Initializable {
 		if (player != null && selectMusic == nowMusic) {// 暂停/停止 再播放同一首歌的时候
 			if (player.getStatus().toString().equals("STOPPED")) {// 停止再播放 同一首歌
 
-				// lyricShowUtil.listenerTime4showLyc(lrcText, nowMusic, player);
-				//歌词同步
+				// 歌词同步
 				lyricShowUtil.showLyricInfo(lrcText, nowMusic, player);
 			} else {// 暂停-->播放
 				System.out.println("暂停---》播放");
@@ -213,32 +211,25 @@ public class MyController implements Initializable {
 			if (player == null) {
 				lyricShowUtil = new LyricShowUtil();
 			} else {
-				lyricShowUtil.isStop = true;
-				player.stop();// 说明是切歌，需要先停止之前播放的歌曲
+				lyricShowUtil.lyricThread.interrupt();// 停止之前歌词同步线程
+				player.dispose();
+				
 			}
 			// 获取当前选中的label
 			nowMusic = musicList.getSelectionModel().getSelectedItem();
-			Media media = new Media(nowMusic.getMp3PlayUrl());
-
+			media = new Media(nowMusic.getMp3PlayUrl());
 			player = new MediaPlayer(media);
 			System.out.println("====正在播放=======" + nowMusic);
 
-			//歌词同步
+			// 歌词同步
 			lyricShowUtil.showLyricInfo(lrcText, nowMusic, player);
-			// lyricShowUtil.listenerTime4showLyc(lrcText, nowMusic, player);
 		}
-
-		float value = player.audioSpectrumThresholdProperty().floatValue();
-		System.out.println(value);
-
-		System.out.println(player.audioSpectrumNumBandsProperty().floatValue());
-		System.out.println(player.getAudioSpectrumListener());
-		System.out.println(player.getAudioSpectrumThreshold());
-		System.out.println(player.getAudioSpectrumNumBands());
 
 		// player.setVolume(0.1);0.0-1.0
 		// System.out.println("音量是：" + player.getVolume());
 
+		// 打开专用播放面板
+		PlayingPanel.obj.openPlayingState(mainStage, player);
 		player.play();
 
 		// lyricShowUtil.showLyricInfo(lrcText, nowMusic, player);
@@ -267,9 +258,8 @@ public class MyController implements Initializable {
 	}
 	public void stop(ActionEvent event) {
 		if (player == null) return;
-		lyricShowUtil.isStop = true;
 		player.stop();
-
+		lyricShowUtil.lyricThread.interrupt();// 停止之前歌词同步线程
 		System.out.println("====已经停止=======" + player.getStatus());
 
 	}
@@ -295,8 +285,8 @@ public class MyController implements Initializable {
 		KeyCombination screenKey = KeyCombination.valueOf("ctrl+alt+p");
 		Mnemonic mc = new Mnemonic(screenBtn, screenKey);
 		scene.addMnemonic(mc);
-		
-		//翻译快捷键
+
+		// 翻译快捷键
 		KeyCombination searchKey = KeyCombination.valueOf("ctrl+alt+i");
 		Mnemonic search = new Mnemonic(myBtn, searchKey);
 		scene.addMnemonic(search);
