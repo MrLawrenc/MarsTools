@@ -1,6 +1,7 @@
 package application.music.playingView;
 
 import application.utils.ImageUtil;
+import application.utils.LyricShowUtil;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -62,17 +63,22 @@ public class PlayingPanel {
 	 * @param mainStage
 	 * @author LIu Mingyao
 	 */
-	public void openPlayingState(Stage mainStage, MediaPlayer mainPlayer) {
+	public void openPlayingState(Stage mainStage, MediaPlayer mainPlayer,
+			LyricShowUtil lyricShowUtil) {
 
+		mainPlayer.play();
 		// if (this.player!=null&&this.player!=mainPlayer) {
 		// //释放所有与player(前player)相关资源(********很重要 不然切歌内存会持续增长)
 		// player.dispose();
 		// }
-		boolean notSame=false;
-		if (player != mainPlayer) {
-			notSame=true;
+
+		if (player != mainPlayer || player == null) {
 			this.player = mainPlayer;
+			duration = player.getMedia().getDuration();
+			// 不是之前的player对象菜添加player各种监听
+			playerListener();
 		}
+
 		if (obj.playingStage == null) {
 			playingStage = new Stage();
 			playingStage.initStyle(StageStyle.TRANSPARENT);// 窗口透明风格
@@ -105,7 +111,7 @@ public class PlayingPanel {
 			System.out.println(width + " * " + height);
 
 			// 添加播放器各组件
-			addLabelAssembly();
+			addLabelAssembly(lyricShowUtil, mainStage);
 
 			// 播放按钮监听
 			playButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -147,6 +153,9 @@ public class PlayingPanel {
 			playingStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				@Override
 				public void handle(WindowEvent event) {
+					lyricShowUtil.lyricThread.interrupt();
+
+					player.stop();
 					player.dispose();
 					mainStage.setIconified(false);
 				}
@@ -155,8 +164,6 @@ public class PlayingPanel {
 		} else {
 			obj.playingStage.show();
 		}
-		// 添加player各种监听，判断是防止同一个对象多次添加监听
-		if (notSame) playerListener();
 
 		mainStage.setIconified(true);
 	}
@@ -186,7 +193,9 @@ public class PlayingPanel {
 
 		player.setOnReady(new Runnable() {
 			public void run() {
-				duration = player.getMedia().getDuration();
+				// System.out.println(player.getMedia().getDuration() + "00");
+				// duration = player.getMedia().getDuration();
+				// System.out.println(duration);
 				updateValues();
 			}
 		});
@@ -214,12 +223,14 @@ public class PlayingPanel {
 	 * @Description 添加播放面板各组件
 	 * @author LIu Mingyao
 	 */
-	private void addLabelAssembly() {
+	private void addLabelAssembly(LyricShowUtil lyricShowUtil, Stage mainStage) {
 		Button close = new Button("退出");
 		close.setOnAction((event) -> {
+			lyricShowUtil.lyricThread.interrupt();
+			player.stop();
 			player.dispose();
 			playingStage.close();
-			// mainStage.setIconified(false);
+			mainStage.setIconified(false);
 		});
 		close.setLayoutX(width - 20);
 		close.setLayoutY(50);
@@ -329,7 +340,6 @@ public class PlayingPanel {
 		}
 		int elapsedMinutes = intElapsed / 60;
 		int elapsedSeconds = intElapsed - elapsedHours * 60 * 60 - elapsedMinutes * 60;
-
 		if (duration.greaterThan(Duration.ZERO)) {
 			int intDuration = (int) Math.floor(duration.toSeconds());
 			int durationHours = intDuration / (60 * 60);

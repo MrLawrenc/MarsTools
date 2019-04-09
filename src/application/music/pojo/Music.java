@@ -1,5 +1,6 @@
 package application.music.pojo;
 
+import javafx.scene.media.MediaPlayer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,13 +13,15 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@AllArgsConstructor@ToString
+@AllArgsConstructor
+@ToString
 public class Music {
 
-	public Music(String mid, String mp3Size, String auther_url, String artist_pic, String artist_pic240,
-			String mp3PlayUrl, String aacPlayUrl, String wmaPlayUrl,String mname) {
+	public Music(String mid, String mp3Size, String auther_url, String artist_pic,
+			String artist_pic240, String mp3PlayUrl, String aacPlayUrl, String wmaPlayUrl,
+			String mname) {
 		super();
-		this.mname=mname;
+		this.mname = mname;
 		this.mid = mid;
 		this.mp3Size = mp3Size;
 		this.auther_url = auther_url;
@@ -41,7 +44,6 @@ public class Music {
 	private String wmaPlayUrl;
 
 	private Comment comment;// 评论
-
-	
+	private MediaPlayer player;// 播放器对象
 
 }

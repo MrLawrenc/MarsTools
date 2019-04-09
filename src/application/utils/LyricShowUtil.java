@@ -43,6 +43,7 @@ public class LyricShowUtil {
 				for (KuwoLyric kuwoLyric : lyric) {
 					String time = kuwoLyric.getTime();
 
+					// boolean isLast=lyric.get(lyric.size()-1)==kuwoLyric?true:false;
 					while (true) {
 						if (this.isStop) {
 							System.out.println("**********结束歌词显示线程**********");
@@ -72,6 +73,7 @@ public class LyricShowUtil {
 			} catch (NullPointerException e2) {
 				System.out.println("退出软件");
 			}
+			System.out.println("歌词显示完毕");
 
 		}, "歌词展示线程");
 

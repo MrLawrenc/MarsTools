@@ -90,6 +90,7 @@ public class ScreenShot {
 
 				// 按esc就退出截圖界面，并且還原主界面
 				if (event.getCode() == KeyCode.ESCAPE) {
+					event.consume();
 					screenStage.close();
 					mainStage.setIconified(false);
 				}
