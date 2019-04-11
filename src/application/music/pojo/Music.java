@@ -16,13 +16,13 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class Music {
-
-	public Music(String mid, String mp3Size, String auther_url, String artist_pic,
+	
+	public Music(String mid, String mname, String mp3Size, String auther_url, String artist_pic,
 			String artist_pic240, String mp3PlayUrl, String aacPlayUrl, String wmaPlayUrl,
-			String mname) {
+			MediaPlayer player) {
 		super();
-		this.mname = mname;
 		this.mid = mid;
+		this.mname = mname;
 		this.mp3Size = mp3Size;
 		this.auther_url = auther_url;
 		this.artist_pic = artist_pic;
@@ -30,6 +30,7 @@ public class Music {
 		this.mp3PlayUrl = mp3PlayUrl;
 		this.aacPlayUrl = aacPlayUrl;
 		this.wmaPlayUrl = wmaPlayUrl;
+		this.player = player;
 	}
 	private String mid;
 	private String mname;

@@ -1,4 +1,4 @@
-package application.music.playingView;
+package application.music.kuwo.playingView;
 
 import application.utils.ImageUtil;
 import application.utils.LyricShowUtil;
@@ -66,12 +66,6 @@ public class PlayingPanel {
 	public void openPlayingState(Stage mainStage, MediaPlayer mainPlayer,
 			LyricShowUtil lyricShowUtil) {
 
-		mainPlayer.play();
-		// if (this.player!=null&&this.player!=mainPlayer) {
-		// //释放所有与player(前player)相关资源(********很重要 不然切歌内存会持续增长)
-		// player.dispose();
-		// }
-
 		if (player != mainPlayer || player == null) {
 			this.player = mainPlayer;
 			duration = player.getMedia().getDuration();
@@ -79,6 +73,8 @@ public class PlayingPanel {
 			playerListener();
 		}
 
+		player.play();
+		
 		if (obj.playingStage == null) {
 			playingStage = new Stage();
 			playingStage.initStyle(StageStyle.TRANSPARENT);// 窗口透明风格
@@ -87,9 +83,9 @@ public class PlayingPanel {
 			// scene透明
 			scene.setFill(Paint.valueOf("#ffffff00"));
 
-			Image image = new Image("/backgroundImg/preview.jpg");
-			// 改变背景图片透明度
-			WritableImage writableImage = new ImageUtil().imgOpacity(image, 0.4);
+			
+			// 设置背景图片并改变背景图片透明度
+			WritableImage writableImage = new ImageUtil().setBackgroundImg(0.4);
 			// 将初始化的背景图片设置进播放界面
 			ImageView iv = new ImageView(writableImage);
 
@@ -113,28 +109,6 @@ public class PlayingPanel {
 			// 添加播放器各组件
 			addLabelAssembly(lyricShowUtil, mainStage);
 
-			// 播放按钮监听
-			playButton.setOnAction(new EventHandler<ActionEvent>() {
-				public void handle(ActionEvent e) {
-					Status status = player.getStatus();
-					if (status == Status.UNKNOWN || status == Status.HALTED) {
-						// don't do anything in these states
-						return;
-					}
-					if (status == Status.PAUSED || status == Status.READY
-							|| status == Status.STOPPED) {
-						// rewind the movie if we're sitting at the end
-						if (atEndOfMedia) {
-							player.seek(player.getStartTime());
-							atEndOfMedia = false;
-						}
-						player.play();
-					} else {
-						player.pause();
-					}
-				}
-			});
-
 			// pane透明
 			pane.setStyle("-fx-background-color:#B5B5B500");
 			playingStage.show();
@@ -156,7 +130,6 @@ public class PlayingPanel {
 					lyricShowUtil.lyricThread.interrupt();
 
 					player.stop();
-					player.dispose();
 					mainStage.setIconified(false);
 				}
 
@@ -169,7 +142,7 @@ public class PlayingPanel {
 	}
 
 	/**
-	 * @Description 播放面板的各种监听事件
+	 * @Description player的各种监听事件
 	 * @author LIu Mingyao
 	 */
 	private void playerListener() {
@@ -179,7 +152,8 @@ public class PlayingPanel {
 					player.pause();
 					stopRequested = false;
 				} else {
-					playButton.setText("||");
+					ImageView imageView = changeBtnPlayImg(playButton);
+					playButton.setGraphic(imageView);
 				}
 			}
 		});
@@ -187,7 +161,8 @@ public class PlayingPanel {
 		player.setOnPaused(new Runnable() {
 			public void run() {
 				System.out.println("onPaused");
-				playButton.setText(">");
+				ImageView imageView = changeBtnStopImg(playButton);
+				playButton.setGraphic(imageView);
 			}
 		});
 
@@ -224,35 +199,79 @@ public class PlayingPanel {
 	 * @author LIu Mingyao
 	 */
 	private void addLabelAssembly(LyricShowUtil lyricShowUtil, Stage mainStage) {
-		Button close = new Button("退出");
+		//关闭按钮
+		Button close = new Button();
+		//透明
+		close.setStyle("-fx-background-color:#B5B5B500");
+		ImageView closeImg = initCloseBtnyImg(close);
+		close.setGraphic(closeImg);
+		close.setLayoutX(width - 35);
+		close.setLayoutY(10);
 		close.setOnAction((event) -> {
 			lyricShowUtil.lyricThread.interrupt();
 			player.stop();
-			player.dispose();
 			playingStage.close();
 			mainStage.setIconified(false);
 		});
-		close.setLayoutX(width - 20);
-		close.setLayoutY(50);
 		pane.getChildren().add(close);
+		
+		
+		
+		//最小化按钮
+		Button small = new Button();
+		small.setStyle("-fx-background-color:#B5B5B500");
+		ImageView smallImg = initSmallBtnyImg(small);
+		small.setGraphic(smallImg);
+		small.setLayoutX(width - 65);
+		small.setLayoutY(10);
+		small.setOnAction((event) -> {
+			playingStage.setIconified(true);//最小化
+		});
+		pane.getChildren().add(small);
+		
+		
 
 		// 添加播放按钮
-		playButton = new Button(">");
-		playButton.setLayoutX(50);
+		playButton = new Button();
+		playButton.setStyle("-fx-background-color:#B5B5B500");
+		ImageView imageView = changeBtnPlayImg(playButton);
+		playButton.setGraphic(imageView);
+		playButton.setLayoutX(35);
 		playButton.setLayoutY(height - 50);
+		// 播放按钮监听
+		playButton.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				Status status = player.getStatus();
+				if (status == Status.UNKNOWN || status == Status.HALTED) {
+					// don't do anything in these states
+					return;
+				}
+				if (status == Status.PAUSED || status == Status.READY || status == Status.STOPPED) {
+					// rewind the movie if we're sitting at the end
+					if (atEndOfMedia) {
+						player.seek(player.getStartTime());
+						atEndOfMedia = false;
+					}
+					player.play();
+				} else {
+					player.pause();
+				}
+			}
+		});
 		pane.getChildren().add(playButton);
+		
 
 		// Add Time label
-		Label timeLabel = new Label("Time: ");
-		timeLabel.setStyle("-fx-background-color:#FF34B3");
-		timeLabel.setLayoutX(80);
-		timeLabel.setLayoutY(height - 45);
-		pane.getChildren().add(timeLabel);
+		Text timeText = new Text("Time: ");
+		timeText.setFill(Paint.valueOf("#FF34B3"));
+		timeText.setLayoutX(playButton.getLayoutX()+50);
+		timeText.setLayoutY(playButton.getLayoutY()+18);
+		pane.getChildren().add(timeText);
 
 		// Add time slider
 		timeSlider = new Slider();
-		timeSlider.setLayoutX(timeLabel.getLayoutX() + timeLabel.getMinWidth() + 30);
-		timeSlider.setLayoutY(height - 45);
+		timeSlider.setLayoutX(playButton.getLayoutX()  + 80);
+		timeSlider.setLayoutY(height - 42);
 		timeSlider.setMinWidth(450);
 		timeSlider.setMaxWidth(Double.MAX_VALUE);
 		timeSlider.valueProperty().addListener(new InvalidationListener() {
@@ -267,24 +286,23 @@ public class PlayingPanel {
 
 		playTime = new Label();
 		// playTime.setStyle("-fx-background-color:#FF34B3");
-		playTime.setLayoutX(timeSlider.getMinWidth() + 120);
+		playTime.setLayoutX(playButton.getLayoutX() + 560);
 		playTime.setLayoutY(height - 45);
 		playTime.setPrefWidth(130);
 		playTime.setMinWidth(50);
 		pane.getChildren().add(playTime);
 
 		// Add the volume label
-		Label volumeLabel = new Label("Vol: ");
-		volumeLabel.setStyle("-fx-background-color:#FF34B3");
-		volumeLabel.setLayoutX(playTime.getLayoutX() + playTime.getMinWidth() + 30);
-		volumeLabel.setLayoutY(height - 45);
-		pane.getChildren().add(volumeLabel);
+		Button volumeBtn = new Button();
+		volumeBtn.setLayoutX(width-120-40);
+		volumeBtn.setLayoutY(playButton.getLayoutY());
+		pane.getChildren().add(initVolImg(volumeBtn));
 
 		// Add Volume slider
 		volumeSlider = new Slider();
-		volumeSlider.setLayoutX(volumeLabel.getLayoutX() + volumeLabel.getMaxWidth() + 20);
+		volumeSlider.setLayoutX( width - 100-20);
 		volumeSlider.setLayoutY(height - 45);
-		volumeSlider.setPrefWidth(70);
+		volumeSlider.setPrefWidth(100);
 		volumeSlider.setMaxWidth(Region.USE_PREF_SIZE);
 		volumeSlider.setMinWidth(30);
 
@@ -317,6 +335,7 @@ public class PlayingPanel {
 	protected void updateValues() {
 		if (playTime != null && timeSlider != null && volumeSlider != null) {
 			Platform.runLater(new Runnable() {
+				@SuppressWarnings("deprecation")
 				public void run() {
 					Duration currentTime = player.getCurrentTime();
 					playTime.setText(formatTime(currentTime, duration));
@@ -363,5 +382,48 @@ public class PlayingPanel {
 			}
 		}
 	}
+	
+	public ImageView changeBtnPlayImg(Button button) {
+		Image playImg = new Image(getClass().getResourceAsStream("/img/play2.png"));
+		ImageView imageView = new ImageView(playImg);
+		imageView.setFitWidth(25);
+		imageView.setFitHeight(25);
+		return imageView;
+	}
+	public ImageView initCloseBtnyImg(Button button) {
+		Image closeImage = new Image(getClass().getResourceAsStream("/img/close1.png"));
+		ImageView imageView = new ImageView(closeImage);
+		imageView.setFitWidth(16);
+		imageView.setFitHeight(16);
+		return imageView;
+	}
+	
+	public ImageView initSmallBtnyImg(Button button) {
+		Image smallImage = new Image(getClass().getResourceAsStream("/img/small.png"));
+		ImageView imageView = new ImageView(smallImage);
+		imageView.setFitWidth(16);
+		imageView.setFitHeight(16);
+		return imageView;
+	}
+	
+	public ImageView changeBtnStopImg(Button button) {
+		Image playImg = new Image(getClass().getResourceAsStream("/img/stop.png"));
+		ImageView imageView = new ImageView(playImg);
+		imageView.setFitWidth(25);
+		imageView.setFitHeight(25);
+		return imageView;
+	}
+	
+	
+	public Button initVolImg(Button volButton) {
+		volButton.setStyle("-fx-background-color:#B5B5B500");
+		Image playImg = new Image(getClass().getResourceAsStream("/img/vol.png"));
+		ImageView imageView = new ImageView(playImg);
+		imageView.setFitWidth(25);
+		imageView.setFitHeight(25);
+		volButton.setGraphic(imageView);
+		return volButton;
+	}
+	
 
 }

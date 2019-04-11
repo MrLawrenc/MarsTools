@@ -31,6 +31,8 @@ import application.music.pojo.kuwo.KuwoPojo;
 import application.utils.HttpUtil;
 import application.utils.MarsException;
 import application.utils.StringUtil;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
 public class KuwoMusic {
 	public final static KuwoMusic obj = new KuwoMusic();
@@ -206,9 +208,13 @@ public class KuwoMusic {
 		String wmadl = (document.select("wmadl").text());// 为空就使用其他两种格式的前缀
 		wmadl = wmadl.isEmpty() ? mp3dl : wmadl;
 
+		Media media = new Media("http://" + mp3dl + mp3path);
+//		 System.out.println(media+"nedia");
+		MediaPlayer player = new MediaPlayer(media);
+
 		return new KuwoPojo(mid, mp3size, auther_url, artist_pic, artist_pic240,
 				"http://" + mp3dl + mp3path, "http://" + aacdl + aacpath, "http://" + wmadl + path,
-				label.getNewMusicName(),label);
+				label.getNewMusicName(), player,label);
 
 	}
 
@@ -221,7 +227,7 @@ public class KuwoMusic {
 	@Deprecated
 	public Music parseMusicInfo2(String mid) {
 
-		String url = "http://antiserver.kuwo.cn/anti.s";
+//		String url = "http://antiserver.kuwo.cn/anti.s";
 		Map<String, String> map = new HashMap<String, String>();
 		Map<String, String> params = new HashMap<String, String>();
 
@@ -296,7 +302,7 @@ public class KuwoMusic {
 	/**
 	 * @Description 根据歌曲label获取歌词信息
 	 * @param label
-	 * @return 歌词信息数组，每个时间段对应的歌词  如：{"time":"3.86","lineLyric":"词：张富贵"}这种数组
+	 * @return 歌词信息数组，每个时间段对应的歌词 如：{"time":"3.86","lineLyric":"词：张富贵"}这种数组
 	 * @author LIu Mingyao
 	 */
 	public List<KuwoLyric> getLyric(KuwoLiLabel label) {
@@ -326,7 +332,7 @@ public class KuwoMusic {
 			}
 
 		} catch (Exception e) {
-			System.out.println("获取歌词信息出错  对应的歌曲是："+label.getNewMusicName());
+			System.out.println("获取歌词信息出错  对应的歌曲是：" + label.getNewMusicName());
 			e.printStackTrace();
 		}
 

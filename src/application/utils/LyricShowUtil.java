@@ -73,7 +73,6 @@ public class LyricShowUtil {
 			} catch (NullPointerException e2) {
 				System.out.println("退出软件");
 			}
-			System.out.println("歌词显示完毕");
 
 		}, "歌词展示线程");
 

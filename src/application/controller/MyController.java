@@ -2,16 +2,13 @@ package application.controller;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
 import application.music.kuwo.KuwoMusic;
-import application.music.playingView.PlayingPanel;
+import application.music.kuwo.playingView.PlayingPanel;
 import application.music.pojo.kuwo.KuwoLiLabel;
 import application.music.pojo.kuwo.KuwoPojo;
 import application.screenshot.ScreenShot;
@@ -32,13 +29,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.Mnemonic;
-import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import lombok.Setter;
-
+//@SuppressWarnings("all")
 public class MyController implements Initializable {
 
 	@FXML
@@ -60,7 +56,6 @@ public class MyController implements Initializable {
 	private TextField lrcText;
 
 	private static KuwoPojo nowMusic;
-	private static Media media;
 	private static KuwoPojo selectMusic;
 	@Setter
 	public Scene scene;
@@ -126,6 +121,8 @@ public class MyController implements Initializable {
 	 * @author LIu Mingyao
 	 */
 	public void search() {
+		musicList.setCellFactory(null);
+
 		String searchStr = searchMusicText.getText();
 		if (StringUtil.isEmpty(searchStr)) {
 			System.out.println("*****************请先输入搜索内容*****************");
@@ -142,35 +139,41 @@ public class MyController implements Initializable {
 		if (labelList.size() == 0 && musciListHTML.contains("天翼飞")) throw new MarsException("请先联网");
 		long a = new Date().getTime();
 
-		// 保证集合线程安全，不报并发修改异常
-		List<FutureTask<KuwoPojo>> s = Collections
-				.synchronizedList(new ArrayList<FutureTask<KuwoPojo>>());
-		// 最多只展示10首歌,开多线程爬虫可以使时间缩短至一个爬虫的时间（100多）
-		for (int i = 0; i < labelList.size() && i < 10; i++) {
+		// 保证集合线程安全
+		List<FutureTask<KuwoPojo>> s = new ArrayList<FutureTask<KuwoPojo>>();
+
+		int musicNum = labelList.size();
+		// 最多只展示10首歌,开多线程爬虫可以使时间缩短至一个爬虫的时间（100多）.酷我一页结果默认是25首歌
+		for (int i = 0; i < musicNum && i < 10; i++) {
 			KuwoLiLabel label = labelList.get(i);
 
 			FutureTask<KuwoPojo> futureTask = new FutureTask<KuwoPojo>(() -> {
-				KuwoPojo music = kuwoMusic.parseMusicInfo1(label);
-				String mp3PlayUrl = music.getMp3PlayUrl();
-				Media media = new Media(mp3PlayUrl);
-				MediaPlayer player = new MediaPlayer(media);
-				music.setPlayer(player);
-				return music;
+				return kuwoMusic.parseMusicInfo1(label);
 			});
+
+			/**
+			 * 使用execute()方法，在使用下面使用futureTask.get()的时候偶尔会报并发修改异常的错。麻烦知道的同学解释下^.^<br>
+			 * submit偶尔也会，原因未知
+			 * 查了资料说的是submit方法可以返回future对象，用于有返回值得情况，而execute只接受runable接口，返回值为void,奇怪的是我是偶尔会报错（报null和并发修改的错）<br>
+			 * 不使用线程池，调用futuretask的get方法也会偶尔报空指针的错误
+			 * **********************现在下面调用get()仍然偶尔会报错,原因未知******************************
+			 */
+			new Thread(futureTask, "获取第" + i + "首歌线程").start();
 			s.add(futureTask);
-			new Thread(futureTask, "音乐搜索多线程" + i).start();
 		}
 
-		for (int i = 0; i < labelList.size() && i < 10; i++) {
+		for (int i = 0; i < musicNum && i < 10; i++) {
+			KuwoPojo pojo = null;
 			try {
-				KuwoPojo pojo = s.get(i).get();
-				data.add(pojo);
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
+				pojo = s.get(i).get();
+			} catch (Exception e) {
+				System.out.println(e.getMessage() + "  获取歌曲列表异常\tpojo:" + pojo);
 			}
+			if (pojo == null) continue;
+
+			data.add(pojo);
 		}
 		s = null;
-		labelList = null;
 		long b = new Date().getTime();
 		System.out.println("本次搜索共耗时 b - a=" + (b - a));
 
@@ -186,7 +189,7 @@ public class MyController implements Initializable {
 			@Override
 			public String toString(KuwoPojo music) {
 				// TODO Auto-generated method stub
-				return music.getMname();
+				return music != null ? music.getMname() : "";
 			}
 
 			@Override
@@ -203,7 +206,6 @@ public class MyController implements Initializable {
 	 * @author LIu Mingyao
 	 */
 	public void play(ActionEvent event) {
-		System.gc();// 回收10m左右空间
 
 		if (selectMusic == null) {
 			System.out.println("*****************请先选择音乐再播放*****************");

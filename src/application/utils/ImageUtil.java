@@ -1,5 +1,7 @@
 package application.utils;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.util.concurrent.FutureTask;
 
 import javafx.scene.image.Image;
@@ -27,6 +29,8 @@ public class ImageUtil {
 	 */
 	public WritableImage imgOpacity(Image image, double opacity) {
 
+		
+		
 		if (opacity < 0 || opacity > 1) throw new MarsException("透明度需要介于0-1之间,请重新设置透明度!");
 
 		// 获取PixelReader
@@ -116,5 +120,22 @@ public class ImageUtil {
 		}
 		
 		return wImage;
+	}
+	
+	/**
+	 * 
+	 * @Description 设置背景图片
+	 * @param opacity
+	 * @author LIu Mingyao
+	 */
+	public WritableImage setBackgroundImg(double opacity) {
+
+		//获取屏幕宽高
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		int screenWidth = (int) screenSize.getWidth();
+		int screenHeight = (int) screenSize.getHeight();
+		
+		Image image = new Image("/img/background/1.png",screenWidth*0.6,0.6*screenHeight,true,true);
+		return imgOpacity(image,opacity);
 	}
 }
