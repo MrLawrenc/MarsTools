@@ -5,7 +5,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 
 import application.music.kuwo.KuwoMusic;
 import application.music.kuwo.playingView.PlayingPanel;
@@ -15,6 +19,7 @@ import application.screenshot.ScreenShot;
 import application.translate.baidu.BaiDuTrans;
 import application.utils.LyricShowUtil;
 import application.utils.MarsException;
+import application.utils.MarsLogUtil;
 import application.utils.StringUtil;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -108,9 +113,8 @@ public class MyController implements Initializable {
 		try {
 			result = BaiDuTrans.getTransResult(in, "auto", "auto");
 		} catch (MarsException e) {
-
 			result = "翻译出错";
-			e.printStackTrace();
+			MarsLogUtil.debug(getClass(), "翻译出错", e);
 		}
 		outText.setText(result);
 
@@ -123,7 +127,8 @@ public class MyController implements Initializable {
 	public void search() {
 		musicList.setCellFactory(null);
 
-		String searchStr = searchMusicText.getText();
+		String searchStr = searchMusicText.getText().replaceAll(" ", "+");// 酷我搜索会将空格替换为+
+		// searchStr = "2";
 		if (StringUtil.isEmpty(searchStr)) {
 			System.out.println("*****************请先输入搜索内容*****************");
 			return;
@@ -132,23 +137,33 @@ public class MyController implements Initializable {
 		// 搜索之前先清空之前内容
 		if (data != null) data.clear();
 
-		System.out.println("正在搜索歌曲.......");
+		MarsLogUtil.info(getClass(), "正在搜索歌曲.......");
 
 		String musciListHTML = kuwoMusic.searchMusic(searchStr);
 		List<KuwoLiLabel> labelList = kuwoMusic.parseLiLabelList(musciListHTML);
 		if (labelList.size() == 0 && musciListHTML.contains("天翼飞")) throw new MarsException("请先联网");
 		long a = new Date().getTime();
 
-		// 保证集合线程安全
-		List<FutureTask<KuwoPojo>> s = new ArrayList<FutureTask<KuwoPojo>>();
+		int playMusicNum = labelList.size() < 10 ? labelList.size() : 10;
+		// System.out.println(playMusicNum);
 
-		int musicNum = labelList.size();
+		List<FutureTask<KuwoPojo>> s = new ArrayList<FutureTask<KuwoPojo>>(playMusicNum);
+
+		CountDownLatch cdl = new CountDownLatch(playMusicNum);// 防止并发修改异常（还没有return完所有的kuwopojo就开始获取get了）
+
+		ExecutorService service = Executors.newFixedThreadPool(playMusicNum);
+
 		// 最多只展示10首歌,开多线程爬虫可以使时间缩短至一个爬虫的时间（100多）.酷我一页结果默认是25首歌
-		for (int i = 0; i < musicNum && i < 10; i++) {
+		for (int i = 0; i < playMusicNum; i++) {
 			KuwoLiLabel label = labelList.get(i);
 
 			FutureTask<KuwoPojo> futureTask = new FutureTask<KuwoPojo>(() -> {
-				return kuwoMusic.parseMusicInfo1(label);
+				KuwoPojo kuwoPojo = kuwoMusic.parseMusicInfo1(label);
+
+				synchronized (KuwoPojo.class) {// 确保countDownLatch能正确自减1
+					cdl.countDown();
+					return kuwoPojo;
+				}
 			});
 
 			/**
@@ -158,24 +173,34 @@ public class MyController implements Initializable {
 			 * 不使用线程池，调用futuretask的get方法也会偶尔报空指针的错误
 			 * **********************现在下面调用get()仍然偶尔会报错,原因未知******************************
 			 */
-			new Thread(futureTask, "获取第" + i + "首歌线程").start();
 			s.add(futureTask);
+			service.submit(futureTask);
+			// new Thread(futureTask, "获取第" + i + "首歌线程").start();
 		}
 
-		for (int i = 0; i < musicNum && i < 10; i++) {
+		try {
+			// cdl.await();
+			cdl.await(5L, TimeUnit.SECONDS);
+		} catch (InterruptedException e1) {
+			MarsLogUtil.debug(getClass(), "cdl出现异常", e1);
+		}
+
+		for (int i = 0; i < playMusicNum && i < 10; i++) {
 			KuwoPojo pojo = null;
 			try {
 				pojo = s.get(i).get();
 			} catch (Exception e) {
-				System.out.println(e.getMessage() + "  获取歌曲列表异常\tpojo:" + pojo);
+				MarsLogUtil.info(getClass(), "  获取歌曲列表异常\tpojo:" + pojo, e);
 			}
+
 			if (pojo == null) continue;
 
 			data.add(pojo);
 		}
 		s = null;
+		service.shutdown();
 		long b = new Date().getTime();
-		System.out.println("本次搜索共耗时 b - a=" + (b - a));
+		MarsLogUtil.info(getClass(), "本次搜索共耗时 b - a=" + (b - a));
 
 		// Platform.runLater(() -> {
 		//

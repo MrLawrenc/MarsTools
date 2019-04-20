@@ -30,6 +30,7 @@ import application.music.pojo.kuwo.KuwoLyric;
 import application.music.pojo.kuwo.KuwoPojo;
 import application.utils.HttpUtil;
 import application.utils.MarsException;
+import application.utils.MarsLogUtil;
 import application.utils.StringUtil;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -175,8 +176,7 @@ public class KuwoMusic {
 				comment.setMId(label.getMId());
 			}
 		} catch (Exception e) {
-
-			e.printStackTrace();
+			MarsLogUtil.error(getClass(), "解析评论失败",e);
 		}
 		return comment;
 	}
@@ -208,14 +208,25 @@ public class KuwoMusic {
 		String wmadl = (document.select("wmadl").text());// 为空就使用其他两种格式的前缀
 		wmadl = wmadl.isEmpty() ? mp3dl : wmadl;
 
-		Media media = new Media("http://" + mp3dl + mp3path);
-//		 System.out.println(media+"nedia");
-		MediaPlayer player = new MediaPlayer(media);
+		String mp3URI = (StringUtil.isEmpty(mp3dl) ? null : "http://" + mp3dl + mp3path);
+		String aacURI = (StringUtil.isEmpty(aacdl) ? null : "http://" + aacdl + aacpath);
+		String wmaURI = (StringUtil.isEmpty(wmadl) ? null : "http://" + wmadl + path);
 
-		return new KuwoPojo(mid, mp3size, auther_url, artist_pic, artist_pic240,
-				"http://" + mp3dl + mp3path, "http://" + aacdl + aacpath, "http://" + wmadl + path,
-				label.getNewMusicName(), player,label);
+		// 防止部分歌曲没有uri地址
+		String playUri = (mp3URI != null
+				? mp3URI
+				: (aacURI != null ? aacURI : (wmaURI != null ? wmaURI : "")));
 
+		if (playUri.equals("")) {
+			MarsLogUtil.info(getClass(), "获取" + label.getMId() + "歌曲播放地址失败!");
+			return null;
+		} else {
+			// MarsLogUtil.info(getClass(), "Media playURI:"+playUri);
+			Media media = new Media(playUri);
+			MediaPlayer player = new MediaPlayer(media);
+			return new KuwoPojo(mid, label.getNewMusicName(), mp3size, auther_url, artist_pic,
+					artist_pic240, mp3URI, aacURI, wmaURI, player, label);
+		}
 	}
 
 	/**
@@ -227,7 +238,7 @@ public class KuwoMusic {
 	@Deprecated
 	public Music parseMusicInfo2(String mid) {
 
-//		String url = "http://antiserver.kuwo.cn/anti.s";
+		// String url = "http://antiserver.kuwo.cn/anti.s";
 		Map<String, String> map = new HashMap<String, String>();
 		Map<String, String> params = new HashMap<String, String>();
 
