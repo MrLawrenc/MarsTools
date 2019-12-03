@@ -1,8 +1,8 @@
 package application.controller;
 
+import application.async.SearchMusicTask;
 import application.music.kuwo.KuwoMusic;
 import application.music.kuwo.playingView.PlayingPanel;
-import application.music.pojo.kuwo.KuwoLiLabel;
 import application.music.pojo.kuwo.KuwoPojo;
 import application.screenshot.ScreenShot;
 import application.translate.baidu.BaiDuTrans;
@@ -29,10 +29,8 @@ import javafx.util.StringConverter;
 import lombok.Setter;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
 
 //@SuppressWarnings("all")
 public class MyController implements Initializable {
@@ -139,71 +137,16 @@ public class MyController implements Initializable {
         }
 
         MarsLogUtil.info(getClass(), "正在搜索歌曲.......");
-
-        String musciListHTML = kuwoMusic.searchMusic(searchStr);
-        List<KuwoLiLabel> labelList = kuwoMusic.parseLiLabelList(musciListHTML);
-        if (labelList.size() == 0 && musciListHTML.contains("天翼飞")) {
-            throw new MarsException("请先联网");
-        }
-        long a = System.currentTimeMillis();
-
-        int playMusicNum = labelList.size() < 10 ? labelList.size() : 10;
-        // System.out.println(playMusicNum);
-        List<FutureTask<KuwoPojo>> s = new ArrayList<FutureTask<KuwoPojo>>(playMusicNum);
-        // 防止并发修改异常（还没有return完所有的kuwopojo就开始获取get了）
-        CountDownLatch cdl = new CountDownLatch(playMusicNum);
-
-        ExecutorService service = Executors.newFixedThreadPool(playMusicNum);
-
-        // 最多只展示10首歌,开多线程爬虫可以使时间缩短至一个爬虫的时间（100多）.酷我一页结果默认是25首歌
-        for (int i = 0; i < playMusicNum; i++) {
-            KuwoLiLabel label = labelList.get(i);
-
-            FutureTask<KuwoPojo> futureTask = new FutureTask<KuwoPojo>(() -> {
-                KuwoPojo kuwoPojo = kuwoMusic.parseMusicInfo1(label);
-
-                synchronized (KuwoPojo.class) {// 确保countDownLatch能正确自减1
-                    cdl.countDown();
-                    return kuwoPojo;
-                }
-            });
-
-            s.add(futureTask);
-            service.submit(futureTask);
-            // new Thread(futureTask, "获取第" + i + "首歌线程").start();
-        }
-
-        try {
-            // cdl.await();
-            cdl.await(5L, TimeUnit.SECONDS);
-        } catch (InterruptedException e1) {
-            MarsLogUtil.debug(getClass(), "cdl出现异常", e1);
-        }
-
-        for (int i = 0; i < playMusicNum && i < 10; i++) {
-            KuwoPojo pojo = null;
-            try {
-                pojo = s.get(i).get();
-            } catch (Exception e) {
-                MarsLogUtil.info(getClass(), "  获取歌曲列表异常\tpojo:" + pojo, e);
+        SearchMusicTask searchMusicTask = new SearchMusicTask(searchStr);
+        CompletableFuture.runAsync(searchMusicTask);
+        searchMusicTask.valueProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (newValue == null) {
+                MarsLogUtil.info(getClass(), "搜索歌曲完毕.......");
+            } else {
+                data.add(newValue);
             }
-
-            if (pojo == null) {
-                continue;
-            }
-
-            data.add(pojo);
-        }
-        s = null;
-        service.shutdown();
-        long b = System.currentTimeMillis();
-        MarsLogUtil.info(getClass(), "本次搜索共耗时 b - a=" + (b - a));
-
-        // Platform.runLater(() -> {
-        //
-        // });
-
-        /**
+        });
+        /*
          * 将Music对象的部分属性(name)取出来展示在ListView面板
          */
         musicList.setCellFactory(TextFieldListCell.forListView(new StringConverter<KuwoPojo>() {

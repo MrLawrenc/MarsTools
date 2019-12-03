@@ -1,14 +1,4 @@
 # MarsTools
-### 
-
-To run the project:
-    
-    mvn compile exec:java
-
-To create a fat jar:
-
-    mvn compile package
-    java -jar shade\hellofx.jar
 
 ###小工具集：全部基于java开发     交流QQ：943903861       文件全部导入eclipse可直接运行，入口在Main里面.###<br>
 ====================================v0.0====================================<br>

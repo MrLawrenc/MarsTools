@@ -9,6 +9,11 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author  : LiuMing
+ * @date : 2019/12/3 22:33
+ * @description :   TODO
+ */
 public class ConfigurationFileUtil {
 	
 	public String toolsVersion;
