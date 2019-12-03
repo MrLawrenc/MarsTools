@@ -1,0 +1,10 @@
+语言种类支持： zh中文 jp日语 en英语 ru俄语 kor韩语 wyw文言文
+
+
+.bat文件开机运行：点击开始--运行--输入gpedit.msc搜索--确定--计算机配置--windows设置--脚本（启动/关机），双击“启动”，点添加--游览--选择你的bat,然后再确定--应用就可以了
+
+
+批处理命令
+@echo off
+echo Starting QQ...
+start "" "C:\Program Files (x86)\Tencent\QQ\Bin\QQScLauncher.exe"
