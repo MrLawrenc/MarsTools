@@ -1,14 +1,13 @@
 package application.utils;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.util.concurrent.FutureTask;
-
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+
+import java.awt.*;
+import java.util.concurrent.FutureTask;
 
 /**
  * @Description 图片处理

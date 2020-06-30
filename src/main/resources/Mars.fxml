@@ -4,6 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
+<?scenebuilder-background-color 0xccedffff?>
 
 <AnchorPane prefHeight="529.0" prefWidth="562.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="application.controller.MyController">
   <!-- TODO Add Nodes -->
@@ -17,9 +18,9 @@
     <Button layoutX="7.0" layoutY="197.0" mnemonicParsing="false" onAction="#search" prefHeight="23.0" prefWidth="85.0" text="搜索" textFill="BLACK" />
     <TextField fx:id="searchMusicText" layoutX="7.0" layoutY="220.0" prefWidth="180.0" />
     <ListView fx:id="musicList" layoutX="7.0" layoutY="296.0" prefHeight="219.0" prefWidth="265.0" />
-    <Button fx:id="screenBtn" layoutX="7.0" layoutY="149.0" mnemonicParsing="false" onAction="#screenShot" prefHeight="23.0" text="点我截图" />
+    <Button fx:id="screenBtn" layoutX="7.0" layoutY="149.0" mnemonicParsing="false" onAction="#screenShot" prefHeight="23.0" style="&#10;" styleClass="font_large" text="点我截图" />
     <Button layoutX="102.0" layoutY="197.0" mnemonicParsing="false" onAction="#nextPageMusic" prefHeight="23.0" prefWidth="85.0" text="下一页" textFill="BLACK" />
-    <TextField fx:id="lrcText" layoutX="216.0" layoutY="220.0"  prefWidth="317.0" />
+    <TextField fx:id="lrcText" layoutX="216.0" layoutY="220.0" prefWidth="317.0" />
     <ListView id="musicList" layoutX="283.0" layoutY="296.0" prefHeight="219.0" prefWidth="265.0" />
   </children>
 </AnchorPane>
