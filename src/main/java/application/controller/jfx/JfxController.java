@@ -1,4 +1,4 @@
-package application.controller;
+package application.controller.jfx;
 
 import application.async.SearchMusicTask;
 import application.music.kuwo.KuwoMusic;
@@ -27,13 +27,21 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 
-//@SuppressWarnings("all")
-public class MyController implements Initializable {
+/**
+ * @author MrLawrenc
+ * date  2020/6/30 23:23
+ * <p>
+ * jfx控制器
+ */
+@SuppressWarnings("all")
+@Slf4j
+public class JfxController implements Initializable {
 
     @FXML
     private Button myBtn;
@@ -77,12 +85,11 @@ public class MyController implements Initializable {
         // 初始化音乐相关信息
         initMusicInfo();
 
-        System.out.println("初始化controller,在加载该类对应的fxml问件时就会被调用");
+        log.info("init jfx controller ");
     }
 
     /**
-     * @Description 音乐相关组件初始化
-     * @author LIu Mingyao
+     * 音乐相关组件初始化
      */
     public void initMusicInfo() {
         lyricShowUtil = new LyricShowUtil();
@@ -100,26 +107,31 @@ public class MyController implements Initializable {
     }
 
     /**
-     * @param event
-     * @Description 翻译
-     * @author LIu Mingyao
+     * 截图按钮点击事件
+     */
+    public void screenShot() {
+        ScreenShot screenShot = ScreenShot.initScreenShot();
+        screenShot.showScreenPanel(mainStage);
+    }
+
+    /**
+     * 翻译事件
      */
     public void trans(ActionEvent event) {
         String in = inText.getText();
         String result;
         try {
-            result = BaiDuTrans.getTransResult(in, "auto", "auto");
+            result = BaiDuTrans.getTransResult(in);
         } catch (MarsException e) {
-            result = "翻译出错";
-            MarsLogUtil.debug(getClass(), "翻译出错", e);
+            result = "Translation error,Please retry!";
+            log.error(result, e);
         }
         outText.setText(result);
 
     }
 
     /**
-     * @Description 根据searchMusicText内容搜歌
-     * @author LIu Mingyao
+     * 根据searchMusicText内容搜歌
      */
     public void search() {
         musicList.setCellFactory(null);
@@ -166,9 +178,7 @@ public class MyController implements Initializable {
     }
 
     /**
-     * @param event
-     * @Description 播放音乐
-     * @author LIu Mingyao
+     * 播放音乐
      */
     public void play(ActionEvent event) {
 
@@ -211,8 +221,7 @@ public class MyController implements Initializable {
     }
 
     /**
-     * @Description 主面板快捷键绑定, 在main方法中被调用
-     * @author LIu Mingyao
+     * 绑定所有设定的快捷键
      */
     public void shortcutKeys() {
 
@@ -225,15 +234,6 @@ public class MyController implements Initializable {
         KeyCombination searchKey = KeyCombination.valueOf("ctrl+alt+i");
         Mnemonic search = new Mnemonic(myBtn, searchKey);
         scene.addMnemonic(search);
-    }
-
-    /**
-     * @Description 截图按钮点击事件
-     * @author LIu Mingyao
-     */
-    public void screenShot() {
-        ScreenShot screenShot = ScreenShot.initScreenShot();
-        screenShot.showScreenPanel(mainStage);
     }
 
 }

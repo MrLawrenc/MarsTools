@@ -1,9 +1,10 @@
 package application;
 
 /**
- * @author : LiuMing
- * @date : 2019/12/3 21:04
- * @description :   TODO
+ * @author MrLawrenc
+ * date  2020/6/30 23:03
+ * <p>
+ * 启动类入口
  */
 public class Launcher {
 
