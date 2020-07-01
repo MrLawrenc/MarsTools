@@ -31,7 +31,6 @@ public class ScreenShot {
     private ScreenShot() {
     }
 
-    ;
 
     private static Stage screenStage;
     private Stage mainStage;
@@ -44,10 +43,6 @@ public class ScreenShot {
 
     /**
      * 初始化ScreenShot各组件
-     *
-     * @return
-     * @Description TODO
-     * @author LIu Mingyao
      */
     public static ScreenShot initScreenShot() {
         screenStage = new Stage();
@@ -181,8 +176,7 @@ public class ScreenShot {
     }
 
     /**
-     * @Description 获取到截图的图片并保存
-     * @author LIu Mingyao
+     * 获取到截图的图片并保存
      */
     public void saveScreenImg() {
         screenStage.close();
@@ -209,7 +203,6 @@ public class ScreenShot {
             ImageIO.write(image, "png", new File(
                     "C:/Users/LIu Mingyao/Pictures/" + format.format(new Date()) + ".png"));
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

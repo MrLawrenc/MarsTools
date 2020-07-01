@@ -21,7 +21,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         try {
 
-            // Parent root = FXMLLoader.load(getClass().getResource("/application/Mars.fxml"));这种静态读取方法，无法获取到Controller的实例对象，就无法各给controller注入值
+            // Parent root = FXMLLoader.load(getClass().getResource("/application/Mars.fxml"));这种静态读取方法，无法获取到Controller的实例对象，就无法给controller注入值
             FXMLLoader fxmlLoader = new FXMLLoader(
                     getClass().getResource("/Mars.fxml"));
             Parent root = fxmlLoader.load();

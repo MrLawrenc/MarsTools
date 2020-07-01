@@ -135,11 +135,11 @@ public class JfxController implements Initializable {
      */
     public void search() {
         musicList.setCellFactory(null);
-
-        String searchStr = searchMusicText.getText().replaceAll(" ", "+");// 酷我搜索会将空格替换为+
-        // searchStr = "2";
+        // 酷我搜索会将空格替换为+
+        String searchStr = searchMusicText.getText().replaceAll(" ", "+");
         if (StringUtil.isEmpty(searchStr)) {
-            MarsLogUtil.debug(getClass(), "*****************请先输入搜索内容*****************");
+            log.debug("*****************请先输入搜索内容*****************");
+            searchMusicText.setText("请先输入搜索内容");
             return;
         }
 
@@ -150,6 +150,7 @@ public class JfxController implements Initializable {
 
         MarsLogUtil.info(getClass(), "正在搜索歌曲.......");
         SearchMusicTask searchMusicTask = new SearchMusicTask(searchStr);
+
         CompletableFuture.runAsync(searchMusicTask);
         searchMusicTask.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) {

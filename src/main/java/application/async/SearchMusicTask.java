@@ -11,8 +11,8 @@ import java.util.List;
 
 /**
  * @author : LiuMingyao
- * @date : 2019/12/3 22:36
- * @description : 异步搜歌
+ * 2019/12/3 22:36
+ * 异步搜歌
  */
 public class SearchMusicTask extends Task<KuwoPojo> {
     private KuwoMusic kuwoMusic = KuwoMusic.obj;
