@@ -3,10 +3,11 @@ package application.config;
 import application.translate.baidu.BaiDuTrans;
 import application.utils.MarsException;
 import com.alibaba.fastjson.JSON;
+import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.Assert;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,8 +40,8 @@ public class Configuration {
             } else {
                 inputStream = Configuration.class.getClassLoader().getResourceAsStream(RESOURCE_NAME);
             }
-            Assert.notNull(inputStream, "input stream is null");
-            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"))) {
+            Preconditions.checkNotNull(inputStream, "input stream is null");
+            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
                     properties.add(line);
