@@ -1,0 +1,6 @@
+spring:
+  main:
+#    标记为非web应用
+    web-application-type: none
+
+stageTitle: hello jfxboot
