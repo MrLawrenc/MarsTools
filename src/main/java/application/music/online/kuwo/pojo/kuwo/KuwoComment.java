@@ -1,8 +1,8 @@
-package application.music.pojo.kuwo;
+package application.music.online.kuwo.pojo.kuwo;
 
 import java.util.List;
 
-import application.music.pojo.Comment;
+import application.music.online.kuwo.pojo.Comment;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

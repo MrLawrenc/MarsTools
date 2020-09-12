@@ -1,12 +1,9 @@
-package application.music.pojo.kuwo;
+package application.music.online.kuwo.pojo.kuwo;
 
-import application.music.pojo.Comment;
-import application.music.pojo.Music;
+import application.music.online.kuwo.pojo.Music;
 import javafx.scene.media.MediaPlayer;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
  * @Description 酷我音乐实体类

@@ -3,6 +3,7 @@ package application;
 import application.controller.jfx.JfxController;
 import application.config.Configuration;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -36,7 +37,7 @@ public class JfxMain extends Application {
             primaryStage.setTitle("mars的小工具 v" + Configuration.toolsVersion);
 
             //监听窗口关闭
-            primaryStage.setOnCloseRequest(e -> System.exit(0));
+            primaryStage.setOnCloseRequest(e -> Platform.exit());
             primaryStage.show();
 
         } catch (Exception e) {

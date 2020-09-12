@@ -3,8 +3,8 @@ package application.test;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import application.music.kuwo.KuwoMusic;
-import application.music.pojo.kuwo.KuwoLiLabel;
+import application.music.online.kuwo.KuwoMusic;
+import application.music.online.kuwo.pojo.kuwo.KuwoLiLabel;
 
 public class Test {
 	public static void main(String[] args) throws Exception {

@@ -1,4 +1,4 @@
-package application.music.pojo;
+package application.music.online.kuwo.pojo;
 
 import javafx.scene.media.MediaPlayer;
 import lombok.AllArgsConstructor;

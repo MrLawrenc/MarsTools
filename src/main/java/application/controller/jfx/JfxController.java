@@ -1,9 +1,9 @@
 package application.controller.jfx;
 
 import application.async.SearchMusicTask;
-import application.music.kuwo.KuwoMusic;
-import application.music.kuwo.playingView.PlayingPanel;
-import application.music.pojo.kuwo.KuwoPojo;
+import application.music.online.kuwo.KuwoMusic;
+import application.music.online.kuwo.view.PlayingPanel;
+import application.music.online.kuwo.pojo.kuwo.KuwoPojo;
 import application.screenshot.ScreenShot;
 import application.translate.baidu.BaiDuTrans;
 import application.utils.LyricShowUtil;

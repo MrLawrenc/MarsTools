@@ -10,9 +10,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
-import application.music.kuwo.KuwoMusic;
-import application.music.pojo.kuwo.KuwoLiLabel;
-import application.music.pojo.kuwo.KuwoPojo;
+import application.music.online.kuwo.KuwoMusic;
+import application.music.online.kuwo.pojo.kuwo.KuwoLiLabel;
+import application.music.online.kuwo.pojo.kuwo.KuwoPojo;
 import application.utils.MarsException;
 import lombok.ToString;
 

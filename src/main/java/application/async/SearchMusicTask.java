@@ -1,12 +1,12 @@
 package application.async;
 
-import application.music.kuwo.KuwoMusic;
-import application.music.pojo.kuwo.KuwoLiLabel;
-import application.music.pojo.kuwo.KuwoPojo;
-import application.utils.MarsException;
-import application.utils.MarsLogUtil;
+import application.music.online.kuwo.KuwoMusic;
+import application.music.online.kuwo.pojo.kuwo.KuwoLiLabel;
+import application.music.online.kuwo.pojo.kuwo.KuwoPojo;
 import javafx.concurrent.Task;
+import lombok.extern.slf4j.Slf4j;
 
+import java.net.InetAddress;
 import java.util.List;
 
 /**
@@ -14,9 +14,10 @@ import java.util.List;
  * 2019/12/3 22:36
  * 异步搜歌
  */
+@Slf4j
 public class SearchMusicTask extends Task<KuwoPojo> {
-    private KuwoMusic kuwoMusic = KuwoMusic.obj;
-    private String searchStr;
+    private final KuwoMusic kuwoMusic = KuwoMusic.obj;
+    private final String searchStr;
 
     public SearchMusicTask(String searchStr) {
         this.searchStr = searchStr;
@@ -24,11 +25,15 @@ public class SearchMusicTask extends Task<KuwoPojo> {
 
     @Override
     protected KuwoPojo call() throws Exception {
+        InetAddress testNet = InetAddress.getByName("www.baidu.com");
+        if (!testNet.isReachable(1000)) {
+            throw new RuntimeException("无法联网");
+        }
+
         String musicListHtml = kuwoMusic.searchMusic(searchStr);
         List<KuwoLiLabel> labelList = kuwoMusic.parseLiLabelList(musicListHtml);
-        if (labelList.size() == 0 && musicListHtml.contains("天翼飞")) {
-            throw new MarsException("请先联网");
-        }
+
+
         long l = System.currentTimeMillis();
         int playMusicNum = Math.min(labelList.size(), 10);
 
@@ -38,7 +43,7 @@ public class SearchMusicTask extends Task<KuwoPojo> {
             KuwoPojo kuwoPojo = kuwoMusic.parseMusicInfo1(label);
             updateValue(kuwoPojo);
         }
-        MarsLogUtil.info(getClass(), "搜索耗时:" + (System.currentTimeMillis() - l));
+        log.info("搜索耗时:{}", (System.currentTimeMillis() - l));
         return null;
     }
 }

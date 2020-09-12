@@ -1,4 +1,4 @@
-package application.music.pojo;
+package application.music.online.kuwo.pojo;
 
 import lombok.Getter;
 import lombok.Setter;

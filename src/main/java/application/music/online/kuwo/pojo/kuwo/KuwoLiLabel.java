@@ -1,4 +1,4 @@
-package application.music.pojo.kuwo;
+package application.music.online.kuwo.pojo.kuwo;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

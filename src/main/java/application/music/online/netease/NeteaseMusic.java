@@ -1,4 +1,4 @@
-package application.music.netease;
+package application.music.online.netease;
 
 /**
  * @author MrLawrenc

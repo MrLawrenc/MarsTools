@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?scenebuilder-background-color 0xccedffff?>
-
 
 <TabPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.controller.jfx.JfxController">
    <tabs>
@@ -33,5 +33,19 @@
       </Tab>
       <Tab text="tool" />
       <Tab text="reptile" />
+      <Tab id="localMusic" text="local music">
+         <content>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <Slider layoutX="117.0" layoutY="471.0" prefHeight="14.0" prefWidth="344.0" />
+                  <Button layoutX="14.0" layoutY="466.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="26.0" text="上" />
+                  <Button layoutX="48.0" layoutY="466.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="26.0" text="play" />
+                  <Button layoutX="83.0" layoutY="466.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="26.0" text="下" />
+                  <Text layoutX="461.0" layoutY="482.0" strokeType="OUTSIDE" strokeWidth="0.0" text="时间" />
+                  <Slider layoutX="501.0" layoutY="471.0" prefHeight="14.0" prefWidth="47.0" />
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
    </tabs>
 </TabPane>

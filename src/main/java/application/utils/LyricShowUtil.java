@@ -1,8 +1,8 @@
 package application.utils;
 
-import application.music.kuwo.KuwoMusic;
-import application.music.pojo.kuwo.KuwoLyric;
-import application.music.pojo.kuwo.KuwoPojo;
+import application.music.online.kuwo.KuwoMusic;
+import application.music.online.kuwo.pojo.kuwo.KuwoLyric;
+import application.music.online.kuwo.pojo.kuwo.KuwoPojo;
 import javafx.scene.control.TextField;
 import javafx.scene.media.MediaPlayer;
 
