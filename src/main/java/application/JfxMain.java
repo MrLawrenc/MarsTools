@@ -1,7 +1,8 @@
 package application;
 
-import application.controller.jfx.JfxController;
 import application.config.Configuration;
+import application.controller.jfx.JfxController;
+import application.music.local.LocalMusicMainView;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -39,7 +40,7 @@ public class JfxMain extends Application {
             //监听窗口关闭
             primaryStage.setOnCloseRequest(e -> Platform.exit());
             primaryStage.show();
-
+            new LocalMusicMainView().open();
         } catch (Exception e) {
             e.printStackTrace();
         }
